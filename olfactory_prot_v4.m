@@ -195,6 +195,7 @@ writeDigitalPin(ard,'d2',0); %neutral off
 
 R.mouse_id = mouse_id;
 R.day_of_training = day_of_training;
+R.pseudorandom_scent_order = trials_scent_order;
 R.number_of_trials = trials_run;
 R.all_data_hits = hit_outcome;
 R.all_data_misses = miss_outcome;
@@ -278,3 +279,5 @@ R.total_licks= total_licks;
 % 
 % writeDigitalPin(ard,'d2',0); %neutral off
     
+
+
