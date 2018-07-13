@@ -1,8 +1,7 @@
 %olfactory_prot_v3
 %run olfactory stimulation via an arduino
-%third draft
-%has addition of water reward (only for A-->lick) and disincentive for 
-%A--> no lick (motor cortex paper did not disincentivize the B-->lick)
+%fourth draft
+%addition of saving to structure
 %LGG 13Jul18
 
 %% initialize the arduino
@@ -45,7 +44,7 @@ max_licks_measured = max_licks * lick_answer_time * 2; %x2 to be safe
 licks_storage = zeros(max_licks_measured, max_trials); %make a storage matrix
 %with the licks from each trial in a separate column
 %using columns to store to take sum of licks later without transposing
-total_licks = zeros(1, max_trials);
+licks_per_trial = zeros(1, max_trials);
 
 hit_outcome = zeros(1,max_trials); %storage for whether each trial was a hit
 %1s will signal hit, 0s will signal not a hit but will NOT signal a miss
@@ -127,7 +126,7 @@ for ii = 1:max_trials
 %     
     licks_storage(:,ii) = licks;
     %%disp('lick count stored') %for testing
-    total_licks(1,ii) = sum(licks); %store row vector of total licks per trial
+    licks_per_trial(ii) = sum(licks); %store row vector of total licks per trial
     
     %calculating hit or miss
     %if there were at least minimum number of licks, the value of the temp variable is 5, if not 0
@@ -173,7 +172,7 @@ for ii = 1:max_trials
     %for seeing if should run kill switch
     
     if start_pos_kill_switch >= 1 && ...
-            sum(total_licks(start_pos_kill_switch:ii))==0 &&...
+            sum(licks_per_trial(start_pos_kill_switch:ii))==0 &&...
             sum(trials_scent_order(start_pos_kill_switch:ii))...
             >= lickless_trial_limit_go
         fprintf('Total trials for mouse ID # %d = %d. \n',mouse_id, trials_run)
@@ -185,9 +184,30 @@ for ii = 1:max_trials
        
 end
 total_hits = sum(hit_outcome); %sum of hit tallies from all trials
-total_misses = sum(miss_outcome); %sum of misss tallies from all trials
+total_misses = sum(miss_outcome); %sum of miss tallies from all trials
+total_licks = sum(licks_per_trial); %sum of licks from all trials
 %this is for testing; comment out on actual trials
 writeDigitalPin(ard,'d2',0); %neutral off
+
+%% Save to a structure
+
+%structure name R = raw data
+
+R.mouse_id = mouse_id;
+R.day_of_training = day_of_training;
+R.number_of_trials = trials_run;
+R.all_data_hits = hit_outcome;
+R.all_data_misses = miss_outcome;
+R.all_data_licks = licks_storage;
+R.licks_per_trial = licks_per_trial;
+R.total_hits = total_hits;
+R.total_misses = total_misses;
+R.total_licks= total_licks;
+
+
+
+
+
 
 %% version with multiple sets of random numbers possible
 % %%
