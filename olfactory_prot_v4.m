@@ -11,8 +11,8 @@ ard = arduino('/dev/tty.usbmodem1431','mega2560'); %first input is port number
 %and port 2 is 1411 (closer to user)
 
 %% manual trial input
-mouse_id = input('Mouse ID:');
-day_of_training = input('Day of training paradigm:');
+mouse_id = input('Mouse ID: ');
+day_of_training = input('Day of training paradigm: ');
 
 %% pseudorandom scent selection for trials
     %for pseudorandomization make a random array 50% 0s and 50% 1s 
@@ -278,5 +278,3 @@ R.total_licks= total_licks;
 % 
 % writeDigitalPin(ard,'d2',0); %neutral off
     
-
-
