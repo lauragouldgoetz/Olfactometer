@@ -70,7 +70,7 @@ scent_A_valve2 = 'd27';
 scent_B_valve1 = 'd28';
 scent_B_valve2 = 'd29';
 
-led_position = 'd7';
+led_position = 'd5';
 lick_detector = 'd12';
 water_valve = 'd22';
 
@@ -230,78 +230,5 @@ R.total_misses = total_misses;
 R.total_licks= total_licks;
 
 
-
-
-
-
-%% version with multiple sets of random numbers possible
-% %%
-% %for loop for each trial
-% for jj = 1:runs_number 
-%     %this jj loop is likely doing nothing (ie just 1 row), 
-%     %but again placed for robustness
-%     for ii = 1:length(max_trials)
-%         %starting conditions 
-%         %first only on neutral for 2 s for resetting
-%         writeDigitalPin(ard,'d2',1); %neutral on
-%         writeDigitalPin(ard,'d3',0); %scent A off
-%         writeDigitalPin(ard,'d4',0); %scent B off
-%         pause(neutral_odor_time) 
-%         %first want to pick which scent flows based on pseudorandom matrix
-%         if trials_scent_order(jj,ii) == 0
-%              %0 means scent A
-%              %1 sec scent A
-%              writeDigitalPin(ard,'d2',0); %neutral off
-%              writeDigitalPin(ard,'d3',1); %scent A on
-%              writeDigitalPin(ard,'d4',0); %scent B off
-%              pause(odor_sampling_time)      
-%         else
-%             %1 means scent B
-%             %1 sec scent B
-%              writeDigitalPin(ard,'d2',0); %neutral off
-%              writeDigitalPin(ard,'d3',0); %scent A off
-%              writeDigitalPin(ard,'d4',1); %scent B on
-%              pause(odor_sampling_time)  
-%         end
-%    %change to neutral flow for remainder of trial
-%     writeDigitalPin(ard,'d2',1); %neutral on
-%     writeDigitalPin(ard,'d3',0); %scent A off
-%     writeDigitalPin(ard,'d4',0); %scent B off
-%     %%pause(.5) %for testing
-%         
-%     %%%
-%     %LED 
-%     %This is the lick cue
-%     writeDigitalPin(ard,'d5',1);
-%     pause(.5)
-%     writeDigitalPin(ard,'d5',0);
-% 
-%     %%%
-%     %lick detector
-%     %window for response
-%     licks = zeros(1,max_licks_measured);
-%     t_delta = zeros(1,max_licks_measured);
-%     tic
-%     for kk = 1:max_licks_measured
-%         t0 = clock;
-%         licks(kk) = readDigitalPin(ard,'d12');
-%         t_delta(kk) = toc;
-%         %waitfor(etime(clock,t0) > time)
-%         while etime(clock,t0) < lick_answer_time
-%         end
-%     end
-%     
-%     licks_storage(ii,:) = licks;
-% 
-%     end
-%     licks_storage_transp = licks_storage';
-%     total_licks = sum(licks_storage_transp); %return a row vector with the
-%     %# of licks per trial (transposing because of how the sum f(x) works)
-%     
-%     
-% end
-% 
-% writeDigitalPin(ard,'d2',0); %neutral off
-    
 
 
