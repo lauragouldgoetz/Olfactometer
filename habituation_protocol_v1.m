@@ -14,6 +14,11 @@ habituate_time = 0.007; %seconds of water delivery, set this (not in paper)
 habituate_loop = 100; %number of led+water loops
 pause_time = .5; %set this, seconds
 
+%% set arduino spots
+
+led_position = 'd5';
+lick_detector = 'd12';
+water_valve = 'd23';
 
 %% loop it
 
