@@ -26,6 +26,8 @@ day_of_training = input('Day of training paradigm: ');
     %go_trials_test == 0.5*max_trials
     
 %% set some conditions for the trial
+habituate_time = 0.007; %seconds, set this (not in paper)
+habituate_loop = 5; %number of led+water loops
 odor_sampling_time = 1; %seconds, set this (paper used 1)
 neutral_odor_time = 2; %seconds, set this (paper used 2)
 led_cue_time = .5; %seconds, set this (paper used .5)
@@ -74,6 +76,25 @@ scent_B_valve2 = 'd29';
 led_position = 'd5';
 lick_detector = 'd12';
 water_valve = 'd23';
+
+%% habituate
+
+%LED and then water
+
+
+for kk = 1:habituate_loop
+    writeDigitalPin(ard,led_position,1); %LED on
+    pause(led_cue_time)
+    writeDigitalPin(ard,led_position,0);
+    pause(.5)
+    writeDigitalPin(ard,water_valve,1); %give water reward
+    pause(habituate_time)
+    writeDigitalPin(ard,water_valve,0);
+    pause(.5)
+end
+
+
+
 
 %% for when the pseudorandom boolean is just 1 row (ie probably what you want)
 %for loop for each trial
