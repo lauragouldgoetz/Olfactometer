@@ -12,8 +12,8 @@ ard = arduino('/dev/tty.usbmodem1431','mega2560'); %first input is port number
 
 water_delivery_default = 5; %deliver water every x seconds, regardless of licking
 training_rounds = 100; %how many loops of water_delivery_default seconds do you want to run?
-reward_time = 0.007; %seconds, set this based on optimizing apparatus 
-%(paper used 5 uL water delivered, but anything greater than 0.007 gives ~8uL)
+reward_time = 0.0001; %seconds, set this based on optimizing apparatus 
+%(paper used 5 uL water delivered, but this is ~4uL)
 
 %% set arduino spots
 

@@ -31,9 +31,8 @@ odor_sampling_time = 1; %seconds, set this (paper used 1)
 neutral_odor_time = 2; %seconds, set this (paper used 2)
 led_cue_time = .5; %seconds, set this (paper used .5)
 lick_answer_time = 1; %seconds, set this (paper used 1)
-reward_time = 0.007; %seconds, set this based on optimizing apparatus 
-%(paper used 5 uL water delivered, but anything greater than 0.007 gives ~8uL)
-
+reward_time = 0.0001; %seconds, set this based on optimizing apparatus 
+%(paper used 5 uL water delivered, but this is ~4uL)
 
 min_licks = 3; %how many licks required for a "lick bout", 3 licks defined in motor cortex paper
 max_licks = 34; %Murakami paper says 34 lick/sec is max, reset if desired
