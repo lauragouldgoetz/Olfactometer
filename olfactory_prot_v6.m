@@ -11,8 +11,11 @@ ard = arduino('/dev/tty.usbmodem1431','mega2560'); %first input is port number
 %and port 2 is 1411 (closer to user)
 
 %% manual trial input
+date = input('Date (YYYYMMDD): ');
 mouse_id = input('Mouse ID: ');
-day_of_training = input('Day of training paradigm: ');
+day_of_training = input('Day of trial paradigm: ');
+starting_volume = input('Volume of water in the apparatus: ');
+
 
 %% pseudorandom scent selection for trials
     %for pseudorandomization make a random array 50% 0s and 50% 1s 
@@ -27,7 +30,7 @@ day_of_training = input('Day of training paradigm: ');
     %go_trials_test == 0.5*max_trials
     
 %% set some conditions for the trial
-odor_sampling_time = 1; %seconds, set this (paper used 1)
+odor_sampling_time = 1.4; %seconds, set this (paper used 1, but our set-up has it take ~.4-.5 s for the odor to reach the mice)
 neutral_odor_time = 2; %seconds, set this (paper used 2)
 led_cue_time = .5; %seconds, set this (paper used .5)
 lick_answer_time = 1; %seconds, set this (paper used 1)
@@ -78,19 +81,20 @@ water_valve = 'd23';
 %% for when the pseudorandom boolean is just 1 row (ie probably what you want)
 %for loop for each trial
 trials_run = 0; %this will be our counter in the loop; placed here so always reset to 0
+%starting conditions 
+%first only on neutral for 2 s for resetting
+writeDigitalPin(ard,neutral_valve1,1); %neutral on
+writeDigitalPin(ard,neutral_valve2,1); %neutral on
+writeDigitalPin(ard,scent_A_valve1,0); %scent A off
+writeDigitalPin(ard,scent_A_valve2,0); %scent A off
+writeDigitalPin(ard,scent_B_valve1,0); %scent B off
+writeDigitalPin(ard,scent_B_valve2,0); %scent B off
+pause(neutral_odor_time)
+
 
 for ii = 1:max_trials
         trials_run = trials_run+1;
-    
-        %starting conditions 
-        %first only on neutral for 2 s for resetting
-        writeDigitalPin(ard,neutral_valve1,1); %neutral on
-        writeDigitalPin(ard,neutral_valve2,1); %neutral on
-        writeDigitalPin(ard,scent_A_valve1,0); %scent A off
-        writeDigitalPin(ard,scent_A_valve2,0); %scent A off
-        writeDigitalPin(ard,scent_B_valve1,0); %scent B off
-        writeDigitalPin(ard,scent_B_valve2,0); %scent B off
-        pause(neutral_odor_time)
+   
         %%disp('beginning of loop') %for testing
         %first want to pick which scent flows based on pseudorandom matrix
         if trials_scent_order(1,ii) == 0
@@ -101,7 +105,7 @@ for ii = 1:max_trials
              writeDigitalPin(ard,scent_A_valve1,1); %scent A on
              writeDigitalPin(ard,scent_A_valve2,1); %scent A on
              pause(odor_sampling_time)
-             disp('scent A trial') %for testing
+             fprintf('trial %d: scent A \n',ii) %for testing
              hit_miss_scent_var = 1; %use for calculating a hit or miss later
         else
             %1 means scent B
@@ -110,7 +114,7 @@ for ii = 1:max_trials
              writeDigitalPin(ard,scent_B_valve1,1); %scent B on
              writeDigitalPin(ard,scent_B_valve2,1); %scent B on
              pause(odor_sampling_time)  
-             disp('scent B trial') %for testing
+             fprintf('trial %d: scent B \n',ii) %for testing
              hit_miss_scent_var = 0; %use for calculating a hit or miss later
         end
    %change to neutral flow for remainder of trial
@@ -217,6 +221,18 @@ total_hits = sum(hit_outcome); %sum of hit tallies from all trials
 total_misses = sum(miss_outcome); %sum of miss tallies from all trials
 total_licks = sum(licks_per_trial); %sum of licks from all trials
 
+ending_volume = input('Volume of water in the apparatus: ');
+volume_delivered = starting_volume - ending_volume;
+fprintf('Total hit trials = %d. \n', total_hits)
+fprintf('Total miss trials = %d. \n', total_misses)
+fprintf('Total volume delivered = %d. \n', volume_delivered)
+
+plot(1:max_trials, hit_outcome, 'ro', 1:max_trials, miss_outcome, 'ko')
+xlabel('Trial #')
+ylabel('Yes [1], No [0]')
+title('Hit and Miss Outcomes')
+legend('Hits','Misses','Location','SouthEast')
+
 %this is for testing; comment out on actual trials
 writeDigitalPin(ard,neutral_valve1,0); %neutral off
 writeDigitalPin(ard,neutral_valve2,0); %neutral off
@@ -238,5 +254,10 @@ R.total_misses = total_misses;
 R.total_licks= total_licks;
 
 
+date_str = num2str(date);
+mouse_id_str = num2str(mouse_id);
+day_of_training_str = num2str(day_of_training);
 
+filename = strcat('data_',date_str,'_mouse',mouse_id_str,'_trial',day_of_training_str,'.mat');
+save(filename, 'R')
 

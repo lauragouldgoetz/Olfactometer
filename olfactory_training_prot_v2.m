@@ -1,15 +1,16 @@
-%olfactory_training_prot_v1
+%olfactory_training_prot_v2
 %run olfactory stimulation via an arduino
 %for training the mice
-%LGG 25Jul18
+%LGG 30Jul18
 
 %% initialize the arduino
-clear all
-ard = arduino('/dev/tty.usbmodem1431','mega2560'); %first input is port number
+%clear all
+%ard = arduino('/dev/tty.usbmodem1431','mega2560'); %first input is port number
 %on Laura's computer, port 1 is 1431 (farther away from user) 
 %and port 2 is 1411 (closer to user)
 
 %% manual trial input
+date = input('Date (YYYYMMDD): ');
 mouse_id = input('Mouse ID: ');
 day_of_training = input('Day of training paradigm: ');
 starting_volume = input('Volume of water in the apparatus: ');
@@ -17,7 +18,8 @@ starting_volume = input('Volume of water in the apparatus: ');
 %% pseudorandom scent selection for trials
     %for pseudorandomization make a random array 50% 0s and 50% 1s 
 %    max_trials = 500; %set this high, since want mouse to decide when to stop
-    max_trials = 300; %this is just for testing the set up
+    max_volume = 1000; %set this for testing, in uL (for water deprivation, 1000uL)
+    max_trials = max_volume/5; %this is just for testing the set up
     %(next: unlikely to reset, but just in case)
     runs_number = 1; %set this to something else if you want to do multiple mice consecutively
     trials_scent_order = mod(reshape(randperm(runs_number*max_trials), runs_number, max_trials), 2 );
@@ -58,7 +60,7 @@ miss_outcome = zeros(1,max_trials); %storage for whether each trial was a miss
 
 intertrial_interval = 8.5; %set this, seconds, paper was 8.5
 punishment_time = 4.5; %set this, additional time added if a miss; paper was 4.5
-lickless_trial_limit_tot = 300; %set this, number of consecutive trials with no licks 
+lickless_trial_limit_tot = 100; %set this, number of consecutive trials with no licks 
 %needed to end the mouse's run
 lickless_trial_limit_go = 2; %set this, number of trials in those consecutive 
 %no lick trials that were receiving a go signal
@@ -236,6 +238,11 @@ total_licks = sum(licks_per_trial); %sum of licks from all trials
 
 ending_volume = input('Volume of water in the apparatus: ');
 volume_delivered = starting_volume - ending_volume;
+fprintf('Total hit trials = %d. \n', total_hits)
+fprintf('Total miss trials = %d. \n', total_misses)
+fprintf('Total volume delivered = %d. \n', volume_delivered)
+
+plot(1:max_trials, hit_outcome, 'ro', 1:max_trials, miss_outcome, 'ko')
 
 
 %this is for testing; comment out on actual trials

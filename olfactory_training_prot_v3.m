@@ -1,7 +1,7 @@
-%olfactory_training_prot_v1
+%olfactory_training_prot_v3
 %run olfactory stimulation via an arduino
 %for training the mice
-%LGG 25Jul18
+%LGG 31Jul18
 
 %% initialize the arduino
 clear all
@@ -10,14 +10,16 @@ ard = arduino('/dev/tty.usbmodem1431','mega2560'); %first input is port number
 %and port 2 is 1411 (closer to user)
 
 %% manual trial input
+date = input('Date (YYYYMMDD): ');
 mouse_id = input('Mouse ID: ');
 day_of_training = input('Day of training paradigm: ');
-starting_volume = input('Volume of water in the apparatus: ');
+starting_volume = input('Volume of water in the apparatus [uL]: ');
 
 %% pseudorandom scent selection for trials
     %for pseudorandomization make a random array 50% 0s and 50% 1s 
 %    max_trials = 500; %set this high, since want mouse to decide when to stop
-    max_trials = 300; %this is just for testing the set up
+    max_volume = 1000; %set this for testing, in uL (for water deprivation, 1000uL)
+    max_trials = max_volume/5; %this is just for testing the set up
     %(next: unlikely to reset, but just in case)
     runs_number = 1; %set this to something else if you want to do multiple mice consecutively
     trials_scent_order = mod(reshape(randperm(runs_number*max_trials), runs_number, max_trials), 2 );
@@ -29,7 +31,7 @@ starting_volume = input('Volume of water in the apparatus: ');
 %% set some conditions for the trial
 habituate_time = 0.0001; %seconds, set this (not in paper)
 habituate_loop = 5; %number of led+water loops
-odor_sampling_time = 1; %seconds, set this (paper used 1)
+odor_sampling_time = 1.4; %seconds, set this (paper used 1, but our set-up has it take ~.4-.5 s for the odor to reach the mice)
 neutral_odor_time = 2; %seconds, set this (paper used 2)
 led_cue_time = .5; %seconds, set this (paper used .5)
 lick_answer_time = 1; %seconds, set this (paper used 1)
@@ -58,7 +60,7 @@ miss_outcome = zeros(1,max_trials); %storage for whether each trial was a miss
 
 intertrial_interval = 8.5; %set this, seconds, paper was 8.5
 punishment_time = 4.5; %set this, additional time added if a miss; paper was 4.5
-lickless_trial_limit_tot = 300; %set this, number of consecutive trials with no licks 
+lickless_trial_limit_tot = 100; %set this, number of consecutive trials with no licks 
 %needed to end the mouse's run
 lickless_trial_limit_go = 2; %set this, number of trials in those consecutive 
 %no lick trials that were receiving a go signal
@@ -101,19 +103,19 @@ end
 %for loop for each trial
 trials_run = 0; %this will be our counter in the loop; placed here so always reset to 0
 
+%starting conditions 
+%first only on neutral for 2 s for resetting
+writeDigitalPin(ard,neutral_valve1,1); %neutral on
+writeDigitalPin(ard,neutral_valve2,1); %neutral on
+writeDigitalPin(ard,scent_A_valve1,0); %scent A off
+writeDigitalPin(ard,scent_A_valve2,0); %scent A off
+writeDigitalPin(ard,scent_B_valve1,0); %scent B off
+writeDigitalPin(ard,scent_B_valve2,0); %scent B off
+pause(neutral_odor_time)
+
 for ii = 1:max_trials
         trials_run = trials_run+1;
-    
-        %starting conditions 
-        %first only on neutral for 2 s for resetting
-        writeDigitalPin(ard,neutral_valve1,1); %neutral on
-        writeDigitalPin(ard,neutral_valve2,1); %neutral on
-        writeDigitalPin(ard,scent_A_valve1,0); %scent A off
-        writeDigitalPin(ard,scent_A_valve2,0); %scent A off
-        writeDigitalPin(ard,scent_B_valve1,0); %scent B off
-        writeDigitalPin(ard,scent_B_valve2,0); %scent B off
-        pause(neutral_odor_time)
-        %%disp('beginning of loop') %for testing
+            %%disp('beginning of loop') %for testing
         %first want to pick which scent flows based on pseudorandom matrix
         if trials_scent_order(1,ii) == 0
              %0 means scent A
@@ -123,7 +125,7 @@ for ii = 1:max_trials
              writeDigitalPin(ard,scent_A_valve1,1); %scent A on
              writeDigitalPin(ard,scent_A_valve2,1); %scent A on
              pause(odor_sampling_time)
-             disp('scent A trial') %for testing
+             fprintf('trial %d: scent A \n',ii) %for testing
              hit_miss_scent_var = 1; %use for calculating a hit or miss later
         else
             %1 means scent B
@@ -132,7 +134,7 @@ for ii = 1:max_trials
              writeDigitalPin(ard,scent_B_valve1,1); %scent B on
              writeDigitalPin(ard,scent_B_valve2,1); %scent B on
              pause(odor_sampling_time)  
-             disp('scent B trial') %for testing
+             fprintf('trial %d: scent B \n',ii) %for testing
              hit_miss_scent_var = 0; %use for calculating a hit or miss later
         end
    %change to neutral flow for remainder of trial
@@ -234,9 +236,17 @@ total_hits = sum(hit_outcome); %sum of hit tallies from all trials
 total_misses = sum(miss_outcome); %sum of miss tallies from all trials
 total_licks = sum(licks_per_trial); %sum of licks from all trials
 
-ending_volume = input('Volume of water in the apparatus: ');
+ending_volume = input('Volume of water in the apparatus [uL]: ');
 volume_delivered = starting_volume - ending_volume;
+fprintf('Total hit trials = %d. \n', total_hits)
+fprintf('Total miss trials = %d. \n', total_misses)
+fprintf('Total volume delivered = %d [uL]. \n', volume_delivered)
 
+plot(1:max_trials, hit_outcome, 'ro', 1:max_trials, miss_outcome, 'ko')
+xlabel('Trial #')
+ylabel('Yes [1], No [0]')
+title('Hit and Miss Outcomes')
+legend('Hits','Misses','Location','SouthEast')
 
 %this is for testing; comment out on actual trials
 writeDigitalPin(ard,neutral_valve1,0); %neutral off
@@ -259,5 +269,10 @@ R.total_misses = total_misses;
 R.total_licks= total_licks;
 R.volume_delivered = volume_delivered;
 
+date_str = num2str(date);
+mouse_id_str = num2str(mouse_id);
+day_of_training_str = num2str(day_of_training);
 
+filename = strcat('data_',date_str,'_mouse',mouse_id_str,'_training',day_of_training_str,'.mat');
+save(filename, 'R')
 
