@@ -24,14 +24,14 @@ load('olfactory_wildtype')
 %and your array of mouse ID numbers is now called 'mouse_id_array'
 
 id_position = find (mouse_id_array == mouse_id); %which number mouse
-if trials_scent_order(id_position) == 0
-    hit_scent = 0;
-    hit_scent_str = 'A';
-    disp('A is a hit')
+if trials_go_scent_order(id_position) == 0
+    go_scent = 0;
+    go_scent_str = 'A';
+    disp('A is the Go Task')
 else
-    hit_scent = 1;
-    hit_scent_str = 'B';
-    disp('B is a hit')
+    go_scent = 1;
+    go_scent_str = 'B';
+    disp('B is the Go Task')
 end
 
 
@@ -106,8 +106,8 @@ pause(neutral_odor_time)
 
 
 %if A is a hit
-if hit_scent == 0
-    disp('Executing with A as a hit') %for testing
+if go_scent == 0
+    disp('Executing with A as the Go Task') %for testing
 
     for ii = 1:max_trials
             trials_run = trials_run+1;
@@ -244,7 +244,7 @@ if hit_scent == 0
     
 else %when B is a hit, reverse everything
    
-    disp('Executing with B as a hit') %for testing 
+    disp('Executing with B as the Go task') %for testing 
    
    for ii = 1:max_trials
                 trials_run = trials_run+1;
@@ -417,7 +417,7 @@ writeDigitalPin(ard,neutral_valve2,0); %neutral off
 
 R.mouse_id = mouse_id;
 R.day_of_training = day_of_training;
-R.hit_scent = hit_scent_str;
+R.go_scent = go_scent_str;
 R.pseudorandom_scent_order = trials_scent_order;
 R.number_of_trials = trials_run;
 R.all_data_hits = hit_outcome;
