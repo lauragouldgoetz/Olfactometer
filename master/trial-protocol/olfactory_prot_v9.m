@@ -1,7 +1,7 @@
 %olfactory_prot_v9
 %run olfactory stimulation via an arduino
 %ninth draft
-%add randomization of which mouse gets which scent first
+%add randomization of which mouse gets which scent as the go task
 %LGG 02Aug18
 
 %% initialize the arduino
