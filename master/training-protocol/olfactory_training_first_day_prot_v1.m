@@ -37,7 +37,8 @@ writeDigitalPin(ard,scent_B_valve2,0); %scent B off
 
 %% manual trial input
 date = input('Date (YYYYMMDD): ');
-mouse_id = input('Mouse ID: ');
+mouse_group = input('Experimental group: ');
+mouse_id = input('Mouse ID #: ');
 day_of_training = input('Day of training paradigm: ');
 starting_volume = input('Volume of water in the apparatus [uL]: ');
 
@@ -269,6 +270,7 @@ writeDigitalPin(ard,neutral_valve2,0); %neutral off
 
 %structure name R = raw data
 
+R.experimental_group = mouse_group;
 R.mouse_id = mouse_id;
 R.day_of_training = day_of_training;
 R.pseudorandom_scent_order = trials_scent_order;
@@ -288,6 +290,6 @@ date_str = num2str(date);
 mouse_id_str = num2str(mouse_id);
 day_of_training_str = num2str(day_of_training);
 
-filename = strcat('data_',date_str,'_mouse',mouse_id_str,'_training',day_of_training_str,'.mat');
+filename = strcat('data_',date_str,'_mouse',experimental_group,mouse_id_str,'_training',day_of_training_str,'.mat');
 save(filename, 'R')
 
