@@ -46,7 +46,7 @@ legend('1 is Correct Rejection, 0 is False Alarm','Location','SouthEast')
 bin_size = 5; %set this
 scaled_no_go_outcomes = no_go_outcomes ./ bin_size; %make the proportion calculations easier later
 moving_average_length = length(no_go_outcomes) - bin_size+1;
-no_go_moving_average = zeros(moving_average_length); %storage
+no_go_moving_average = zeros(moving_average_length,1); %storage
 
 for index = 1:moving_average_length
     no_go_moving_average(index) = sum(scaled_no_go_outcomes(index:(index+bin_size-1)));
@@ -90,8 +90,8 @@ end
 
 %% now calculate a running CR %
 
-running_CR_total = zeros(no_go_length);
-running_CR_percent = zeros(no_go_length);
+running_CR_total = zeros(no_go_length,1);
+running_CR_percent = zeros(no_go_length,1);
 running_CR_count = 0; %initialize
 
 for jj = 1:no_go_length
@@ -130,5 +130,5 @@ end
 
 %% save it
 
-% new_filename = strcat('correct_rejections_analysis_',date_str,'_mouse',mouse_group,mouse_id_str,'_trial',day_of_training_str,'.mat');
-% save(new_filename)
+new_filename = strcat('correct_rejections_analysis_',date_str,'_mouse',mouse_group,mouse_id_str,'_trial',day_of_training_str,'.mat');
+save(new_filename)
